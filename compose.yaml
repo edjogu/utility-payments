@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: utility-payments-postgres
+    environment:
+      POSTGRES_DB: utility_payments
+      POSTGRES_USER: utility_user
+      POSTGRES_PASSWORD: utility_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - utility_payments_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  utility_payments_postgres_data:

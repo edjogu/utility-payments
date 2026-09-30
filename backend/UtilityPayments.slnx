@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/UtilityPayments.Api/UtilityPayments.Api.csproj" />
+    <Project Path="src/UtilityPayments.Application/UtilityPayments.Application.csproj" />
+    <Project Path="src/UtilityPayments.Domain/UtilityPayments.Domain.csproj" />
+    <Project Path="src/UtilityPayments.Infrastructure/UtilityPayments.Infrastructure.csproj" />
+    <Project Path="src/UtilityPayments.Services/UtilityPayments.Services.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/UtilityPayments.Api.Tests/UtilityPayments.Api.Tests.csproj" />
+    <Project Path="tests/UtilityPayments.Application.Tests/UtilityPayments.Application.Tests.csproj" />
+    <Project Path="tests/UtilityPayments.Domain.Tests/UtilityPayments.Domain.Tests.csproj" />
+    <Project Path="tests/UtilityPayments.Infrastructure.Tests/UtilityPayments.Infrastructure.Tests.csproj" />
+    <Project Path="tests/UtilityPayments.Services.Tests/UtilityPayments.Services.Tests.csproj" />
+  </Folder>
+</Solution>
