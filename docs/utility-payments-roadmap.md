@@ -238,7 +238,13 @@ terminan correctamente, PostgreSQL puede levantarse con Docker Compose y la API 
 
 ---
 
-# Fase 1 — Listar Utility Payment Agreements
+# Fase 1 — Listar Utility Payment Agreements — CLOSED
+
+## Estado
+
+```text
+CLOSED
+```
 
 ## Objetivo
 
@@ -268,33 +274,55 @@ PostgreSQL
 
 ### Domain
 
-- [ ] Modelar únicamente lo necesario para `UtilityPaymentAgreement`.
-- [ ] Definir invariantes reales si aparecen.
-- [ ] No agregar entidades futuras sin necesidad.
+- [x] Modelar únicamente lo necesario para `UtilityPaymentAgreement`.
+- [x] Crear la entidad `UtilityPaymentAgreement`.
+- [x] No agregar entidades futuras sin necesidad.
 
 ### Application
 
-- [ ] Crear caso de uso para listar agreements.
-- [ ] Definir DTO/result apropiado.
-- [ ] Definir abstracción de persistencia si es necesaria.
+- [x] Crear el caso de uso `GetActiveUtilityPaymentAgreements`.
+- [x] Definir `UtilityPaymentAgreementResponse` como modelo de respuesta.
+- [x] Definir la abstracción de persistencia `IUtilityPaymentAgreementRepository`.
 
 ### Infrastructure
 
-- [ ] Configurar persistencia de `UtilityPaymentAgreement`.
-- [ ] Implementar acceso a datos.
-- [ ] Crear migración inicial necesaria.
-- [ ] Agregar datos iniciales controlados.
+- [x] Crear la tabla PostgreSQL `public.utility_payment_agreements`.
+- [x] Crear `backend/database/scripts/001_create_utility_payment_agreements.sql`.
+- [x] Crear `backend/database/scripts/002_seed_utility_payment_agreements.sql`.
+- [x] Configurar el mapping de EF Core y el `DbSet` de `UtilityPaymentAgreement`.
+- [x] Implementar `UtilityPaymentAgreementRepository`.
+- [x] Agregar datos iniciales controlados mediante un script SQL versionado.
 
 ### Api
 
-- [ ] Crear endpoint:
+- [x] Crear endpoint:
 
 ```text
 GET /api/utility-payment-agreements
 ```
 
-- [ ] Documentarlo en OpenAPI.
-- [ ] Validarlo desde Scalar.
+- [x] Documentarlo en OpenAPI.
+- [x] Validarlo desde Scalar.
+
+### Frontend
+
+- [x] Crear el modelo TypeScript `UtilityPaymentAgreement`.
+- [x] Crear `UtilityPaymentAgreementsService` para consumir:
+
+```text
+GET /api/utility-payment-agreements
+```
+
+- [x] Crear el componente `UtilityPaymentAgreements`.
+- [x] Manejar el estado de carga.
+- [x] Mostrar la lista de agreements cuando la consulta es exitosa.
+- [x] Manejar el estado de error.
+- [x] Usar el control flow de Angular (`@if` / `@for`) en el template.
+- [x] Mantener una interfaz visual simple; el styling se abordará en una iteración posterior.
+
+### Integración backend/frontend
+
+- [x] Permitir mediante CORS el frontend Angular local en `http://localhost:4200`.
 
 ### Datos iniciales
 
@@ -306,14 +334,59 @@ Ejemplos:
 
 ### Tests
 
-- [ ] Tests de dominio si existen reglas de dominio reales.
-- [ ] Tests de Application.
-- [ ] Tests de Infrastructure contra PostgreSQL cuando corresponda.
-- [ ] Test de API del endpoint.
+- [x] Tests de Application para el mapping de agreements y la colección vacía.
+- [x] Tests de Infrastructure contra PostgreSQL real que filtran activos, ordenan por `Name` y limpian los datos de prueba.
+- [x] Tests de API para respuestas `200 OK` con una colección vacía y con datos.
+- [x] Los tests de integración y API usan `utility_payments_tests`.
+- [x] Los tests de API preparan y limpian su propio estado.
+- [x] Ejecutar los tests de Angular con Karma + Firefox.
+- [x] Probar el componente con un mock de `UtilityPaymentAgreementsService`.
+- [x] Probar de forma independiente el comportamiento HTTP del servicio.
+- [x] Suite frontend: `7 SUCCESS`.
+
+## Decisiones
+
+- No usar migraciones de EF Core por ahora.
+- Manejar los cambios de base de datos mediante scripts SQL versionados.
+- Usar `snake_case` en PostgreSQL.
+- `IntegrationKey` no es unique.
+- Usar Application Use Cases en lugar de Service + IService cuando no existe una necesidad real de esa abstracción.
+- No exponer directamente las entidades de Domain por HTTP.
+- Usar `AsNoTracking()` en las consultas de solo lectura.
+- Mantener `Microsoft.EntityFrameworkCore` y `Microsoft.EntityFrameworkCore.Relational` alineados en la versión `10.0.12`.
+- Usar `utility_payments_tests` para los tests de integración y API.
+
+## Validación
+
+- [x] `dotnet build UtilityPayments.slnx` exitoso.
+- [x] Tests exitosos.
+- [x] Endpoint validado con `curl`.
+- [x] Endpoint visible en Scalar.
+- [x] El frontend consume `GET /api/utility-payment-agreements`.
+- [x] Los estados de carga, éxito y error están cubiertos por el componente.
+- [x] Los 7 tests del frontend pasan con Karma + Firefox.
+
+## Cierre funcional
+
+```text
+4ef79ac feat(agreements): add utility payment agreements vertical slice
+```
 
 ## Definition of Done
 
-El endpoint retorna desde PostgreSQL los agreements disponibles y las pruebas relevantes pasan.
+El backend retorna desde PostgreSQL los agreements activos disponibles y el frontend los consulta y presenta al usuario, incluyendo los estados de carga y error. Las pruebas relevantes de backend y frontend pasan.
+
+Estado: `CLOSED`.
+
+El vertical slice completo queda cerrado siguiendo la secuencia:
+
+```text
+backend feature
+→ frontend feature
+→ next feature
+```
+
+El siguiente feature planificado es `UtilityPaymentRequiredInfo`.
 
 ---
 
@@ -557,7 +630,13 @@ Al menos un colector funciona mediante HTTP y está desacoplado de Application m
 
 ---
 
-# Fase 9 — Inicio del frontend Angular
+# Fase 9 — Inicio del frontend Angular — CLOSED
+
+## Estado
+
+```text
+CLOSED
+```
 
 ## Objetivo
 
@@ -583,17 +662,17 @@ Antes de introducir cada concepto:
 
 ## Primeros conceptos
 
-- [ ] Estructura del proyecto Angular.
-- [ ] Standalone Components.
+- [x] Estructura del proyecto Angular.
+- [x] Standalone Components.
 - [ ] Routing.
-- [ ] Services.
-- [ ] Dependency Injection.
-- [ ] HttpClient.
+- [x] Services.
+- [x] Dependency Injection.
+- [x] HttpClient.
 - [ ] Reactive Forms.
-- [ ] Observables.
-- [ ] RxJS.
+- [x] Observables.
+- [x] RxJS.
 - [ ] Signals.
-- [ ] Manejo de errores.
+- [x] Manejo de errores.
 
 ## Primer flujo
 
@@ -609,6 +688,8 @@ Mostrar Agreements
 
 Angular consume el primer endpoint real del backend y muestra la información al usuario.
 
+Estado: `CLOSED`.
+
 ---
 
 # Fase 10 — Flujo frontend de pago
@@ -619,7 +700,7 @@ Construir progresivamente el flujo completo desde Angular.
 
 ## Iteraciones
 
-- [ ] Listar agreements.
+- [x] Listar agreements.
 - [ ] Seleccionar agreement.
 - [ ] Mostrar información requerida.
 - [ ] Seleccionar cuenta.
@@ -708,7 +789,7 @@ Cada elemento se evaluará por necesidad real.
 ## Fase activa
 
 ```text
-Fase 0 — Bootstrap técnico
+Fase 2 — UtilityPaymentRequiredInfo
 ```
 
 ## Completado
@@ -725,21 +806,27 @@ Fase 0 — Bootstrap técnico
 - Scalar.
 - Build completo.
 - Test completo.
+- Backend de `List Utility Payment Agreements`.
+- Frontend Angular 20 de `List Utility Payment Agreements`.
+- Integración local backend/frontend mediante CORS.
+- Estados de carga, éxito y error en el componente.
+- Pruebas de componente con el servicio mockeado.
+- Pruebas HTTP independientes del servicio.
+- Suite frontend: `7 SUCCESS` con Karma + Firefox.
+- Vertical slice `List Utility Payment Agreements`: `CLOSED`.
 
 ## Próximo punto al retomar
 
 ```text
-PostgreSQL + Docker Compose
+UtilityPaymentRequiredInfo
 ```
 
-Después:
+El proyecto continúa por vertical slices:
 
 ```text
-EF Core
-→ DbContext
-→ conexión
-→ Health Check PostgreSQL
-→ cierre de Fase 0
+backend feature
+→ frontend feature
+→ next feature
 ```
 
 ---

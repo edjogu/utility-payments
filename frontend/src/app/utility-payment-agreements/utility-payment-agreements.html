@@ -1,0 +1,19 @@
+<section>
+  <h2>Available services</h2>
+  <p>Select the service you want to pay.</p>
+
+  @if (loading()) {
+    <p>Loading services...</p>
+  } @else if (error()) {
+    <p>{{ error() }}</p>
+  } @else {
+    <ul>
+      @for (agreement of agreements(); track agreement.id) {
+        <li>
+          <strong>{{ agreement.name }}</strong>
+          <span> - {{ agreement.description }}</span>
+        </li>
+      }
+    </ul>
+  }
+</section>

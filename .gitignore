@@ -11,9 +11,6 @@
 .idea/
 *.DotSettings.user
 
-# VS Code
-.vscode/
-
 # Neovim
 *.swp
 *.swo

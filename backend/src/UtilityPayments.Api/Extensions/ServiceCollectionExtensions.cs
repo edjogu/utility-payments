@@ -11,6 +11,17 @@ public static class ServiceCollectionExtensions
             ?? throw new InvalidOperationException(
                 "Connection string 'UtilityPaymentsDatabase' was not found.");
 
+        services.AddCors(options =>
+                {
+                    options.AddPolicy("Frontend", policy =>
+                            {
+                                policy
+                                .WithOrigins("http://localhost:4200")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                            });
+                });
+
         services.AddHealthChecks()
             .AddNpgSql(connectionString);
 
