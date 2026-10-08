@@ -8,6 +8,7 @@ using UtilityPayments.Infrastructure.Persistence;
 
 namespace UtilityPayments.Api.Tests.UtilityPaymentAgreements;
 
+[Collection("Database")]
 public class GetUtilityPaymentAgreementsTests
     : IClassFixture<CustomWebApplicationFactory>
 {
@@ -112,6 +113,11 @@ public class GetUtilityPaymentAgreementsTests
             .GetRequiredService<UtilityPaymentsDbContext>();
 
         await dbContext.Database.ExecuteSqlRawAsync(
-            "TRUNCATE TABLE public.utility_payment_agreements RESTART IDENTITY;");
+    """
+    TRUNCATE TABLE
+        public.utility_payment_required_info,
+        public.utility_payment_agreements
+    RESTART IDENTITY;
+    """);
     }
 }

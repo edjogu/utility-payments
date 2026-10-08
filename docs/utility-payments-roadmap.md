@@ -392,6 +392,14 @@ El siguiente feature planificado es `UtilityPaymentRequiredInfo`.
 
 # Fase 2 — Información requerida por Agreement
 
+## Estado
+
+```text
+IN PROGRESS
+```
+
+Backend completado. Frontend pendiente.
+
 ## Objetivo
 
 Permitir que cada colector defina qué información debe ingresar el usuario antes de realizar una consulta.
@@ -409,16 +417,87 @@ Un agreement puede requerir:
 
 ## Alcance
 
-- [ ] Modelar `UtilityPaymentRequiredInfo`.
-- [ ] Relacionarlo con `UtilityPaymentAgreement`.
-- [ ] Consultar información requerida por agreement.
-- [ ] Definir orden, etiqueta, obligatoriedad y tipo básico de campo.
-- [ ] Exponer endpoint correspondiente.
-- [ ] Agregar pruebas.
+- [x] Modelar `UtilityPaymentRequiredInfo`.
+- [x] Relacionarlo con `UtilityPaymentAgreement`.
+- [x] Consultar información requerida por agreement.
+- [x] Definir orden, etiqueta, obligatoriedad y tipo básico de campo.
+- [x] Exponer endpoint correspondiente.
+- [x] Agregar pruebas de backend.
+- [ ] Consumir el endpoint desde Angular.
+- [ ] Mostrar dinámicamente los campos requeridos al seleccionar un agreement.
+
+### Base de datos
+
+- [x] Crear `backend/database/scripts/003_create_utility_payment_required_info.sql`.
+- [x] Crear `backend/database/scripts/004_seed_utility_payment_required_info.sql`.
+- [x] Crear la tabla `utility_payment_required_info` con FK a `utility_payment_agreements`.
+- [x] Definir unicidad por `(utility_payment_agreement_id, code)`.
+- [x] Definir unicidad por `(utility_payment_agreement_id, display_order)`.
+- [x] Agregar checks para `data_type`, `display_order`, `min_length`, `max_length` y el rango de longitudes.
+- [x] Agregar índice por `utility_payment_agreement_id`.
+- [x] Agregar datos iniciales para los agreements existentes:
+  - `ELECTRICITY`: `CONTRACT_NUMBER`, `CUSTOMER_NUMBER`.
+  - `WATER`: `ACCOUNT_NUMBER`, `METER_NUMBER`.
+  - `MOBILE`: `PHONE_NUMBER`.
+
+### Domain
+
+- [x] Crear `UtilityPaymentRequiredInfo`.
+- [x] Crear `RequiredInfoDataType`.
+
+### Application
+
+- [x] Crear `IUtilityPaymentRequiredInfoRepository`.
+- [x] Crear el caso de uso `GetActiveUtilityPaymentRequiredInfos`.
+- [x] Crear `UtilityPaymentRequiredInfoResponse`.
+- [x] Registrar las dependencias de Application.
+
+### Infrastructure
+
+- [x] Crear `UtilityPaymentRequiredInfoConfiguration`.
+- [x] Agregar `DbSet<UtilityPaymentRequiredInfo>`.
+- [x] Implementar `UtilityPaymentRequiredInfoRepository`.
+- [x] Registrar las dependencias de Infrastructure.
+
+### Api
+
+- [x] Crear endpoint:
+
+```text
+GET /api/utility-payment-agreements/{agreementId}/required-info
+```
+
+- [x] Mantener Minimal APIs sin introducir Controllers.
+- [x] Organizar los endpoints por feature en `Api/Endpoints`.
+- [x] Agregar `EndpointsExtensions` como agregador y dejar `Program.cs` con `app.MapEndpoints();`.
+
+### Tests y validación
+
+- [x] Actualizar los tests de integración existentes para limpiar también `utility_payment_required_info`.
+- [x] Agregar colecciones xUnit `Database` en `Api.Tests` e `Infrastructure.Tests` para evitar ejecución paralela sobre `utility_payments_tests`.
+- [x] `Application.Tests` pasando.
+- [x] `Infrastructure.Tests` pasando.
+- [x] `Api.Tests` pasando.
+- [x] Suite backend: 9 tests, 9 correctos, 0 errores.
+- [x] Validar manualmente el endpoint con `curl`; los resultados se retornan ordenados por `displayOrder`.
+
+`Domain.Tests` y `Services.Tests` todavía no contienen tests reales y muestran la advertencia `no tests available`.
+
+## Próximo paso
+
+Implementar el frontend Angular para consumir:
+
+```text
+GET /api/utility-payment-agreements/{agreementId}/required-info
+```
+
+y mostrar dinámicamente los campos requeridos al seleccionar un agreement.
 
 ## Definition of Done
 
-Dado un agreement, la API puede informar qué datos necesita para realizar un Inquiry.
+Dado un agreement, la API puede informar qué datos necesita para realizar un Inquiry y el frontend puede presentar dinámicamente esos campos al usuario.
+
+Estado: `IN PROGRESS`. El backend de `UtilityPaymentRequiredInfo` está completado; la Fase 2 permanece abierta hasta completar el frontend.
 
 ---
 

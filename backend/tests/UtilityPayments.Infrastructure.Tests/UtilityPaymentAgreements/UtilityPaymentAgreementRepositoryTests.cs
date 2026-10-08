@@ -5,6 +5,7 @@ using UtilityPayments.Infrastructure.UtilityPaymentAgreements;
 
 namespace UtilityPayments.Infrastructure.Tests.UtilityPaymentAgreements;
 
+[Collection("Database")]
 public class UtilityPaymentAgreementRepositoryTests
 {
     private const string ConnectionString =
@@ -86,6 +87,11 @@ public class UtilityPaymentAgreementRepositoryTests
         UtilityPaymentsDbContext dbContext)
     {
         await dbContext.Database.ExecuteSqlRawAsync(
-            "TRUNCATE TABLE public.utility_payment_agreements RESTART IDENTITY;");
+    """
+    TRUNCATE TABLE
+        public.utility_payment_required_info,
+        public.utility_payment_agreements
+    RESTART IDENTITY;
+    """);
     }
 }

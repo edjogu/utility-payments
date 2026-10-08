@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using UtilityPayments.Domain.UtilityPaymentAgreements;
+using UtilityPayments.Domain.UtilityPaymentRequiredInfos;
 
 namespace UtilityPayments.Infrastructure.Persistence;
 
@@ -8,6 +9,9 @@ public class UtilityPaymentsDbContext(DbContextOptions<UtilityPaymentsDbContext>
 {
     public DbSet<UtilityPaymentAgreement> UtilityPaymentAgreements =>
         Set<UtilityPaymentAgreement>();
+
+    public DbSet<UtilityPaymentRequiredInfo> UtilityPaymentRequiredInfos =>
+        Set<UtilityPaymentRequiredInfo>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
