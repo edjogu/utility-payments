@@ -133,7 +133,13 @@ Api
 
 ---
 
-# Fase 0 — Bootstrap técnico
+# Fase 0 — Bootstrap técnico — CLOSED
+
+## Estado
+
+```text
+CLOSED
+```
 
 ## Objetivo
 
@@ -191,34 +197,34 @@ Dejar lista una base técnica estable para empezar a desarrollar funcionalidades
 - [x] `/openapi/v1.json` responde correctamente.
 - [x] Scalar funciona.
 
-## Pendiente para cerrar Fase 0
+## Infraestructura local y persistencia
 
 ### PostgreSQL y Docker
 
-- [ ] Crear `compose.yaml`.
-- [ ] Levantar PostgreSQL con Docker Compose.
-- [ ] Definir base de datos, usuario y credenciales locales.
-- [ ] Validar conexión al contenedor.
+- [x] Crear `compose.yaml`.
+- [x] Levantar PostgreSQL con Docker Compose.
+- [x] Definir base de datos, usuario y credenciales locales.
+- [x] Validar conexión al contenedor.
 
 ### EF Core
 
-- [ ] Agregar Entity Framework Core.
-- [ ] Agregar provider PostgreSQL.
-- [ ] Crear `UtilityPaymentsDbContext`.
-- [ ] Definir ubicación de configuraciones de entidades.
-- [ ] Preparar estrategia inicial de migraciones.
+- [x] Agregar Entity Framework Core.
+- [x] Agregar el provider PostgreSQL de Npgsql.
+- [x] Crear `UtilityPaymentsDbContext`.
+- [x] Definir `Infrastructure/Persistence/Configurations` como ubicación de las configuraciones de entidades.
+- [x] Adoptar scripts SQL versionados en `backend/database/scripts` para los cambios de base de datos, sin EF Core migrations por ahora.
 
 ### Configuración
 
-- [ ] Configurar connection string.
-- [ ] Mantener secretos locales fuera del repositorio cuando corresponda.
-- [ ] Validar configuración por ambiente.
+- [x] Configurar la connection string `UtilityPaymentsDatabase`.
+- [x] Mantener archivos `.env` fuera del repositorio cuando corresponda.
+- [x] Configurar los valores locales de desarrollo de forma consistente con `compose.yaml`.
 
 ### Health Check de base de datos
 
-- [ ] Agregar PostgreSQL al sistema de Health Checks.
-- [ ] Verificar comportamiento con PostgreSQL disponible.
-- [ ] Verificar comportamiento con PostgreSQL detenido.
+- [x] Agregar PostgreSQL al sistema de Health Checks.
+- [x] Verificar comportamiento con PostgreSQL disponible: `/health` responde `200 Healthy`.
+- [x] Verificar comportamiento con PostgreSQL detenido: `/health` responde `503 Unhealthy`.
 
 ## Definition of Done
 
@@ -234,7 +240,9 @@ y:
 dotnet test UtilityPayments.slnx
 ```
 
-terminan correctamente, PostgreSQL puede levantarse con Docker Compose y la API puede verificar su disponibilidad mediante Health Checks.
+terminan correctamente, PostgreSQL puede levantarse con Docker Compose y la API verifica su disponibilidad mediante Health Checks. EF Core usa Npgsql y `UtilityPaymentsDbContext`; los cambios de base de datos se gestionan mediante scripts SQL versionados, sin EF Core migrations por ahora.
+
+Estado: `CLOSED`.
 
 ---
 
@@ -369,7 +377,11 @@ Ejemplos:
 ## Cierre funcional
 
 ```text
+Backend y base del vertical slice:
 4ef79ac feat(agreements): add utility payment agreements vertical slice
+
+Frontend y cierre del vertical slice completo:
+bf4e53d feat(agreements): add Angular agreements vertical slice
 ```
 
 ## Definition of Done
@@ -390,15 +402,13 @@ El siguiente feature planificado es `UtilityPaymentRequiredInfo`.
 
 ---
 
-# Fase 2 — Información requerida por Agreement
+# Fase 2 — Información requerida por Agreement — CLOSED
 
 ## Estado
 
 ```text
-IN PROGRESS
+CLOSED
 ```
-
-Backend completado. Frontend pendiente.
 
 ## Objetivo
 
@@ -423,8 +433,8 @@ Un agreement puede requerir:
 - [x] Definir orden, etiqueta, obligatoriedad y tipo básico de campo.
 - [x] Exponer endpoint correspondiente.
 - [x] Agregar pruebas de backend.
-- [ ] Consumir el endpoint desde Angular.
-- [ ] Mostrar dinámicamente los campos requeridos al seleccionar un agreement.
+- [x] Consumir el endpoint desde Angular.
+- [x] Mostrar dinámicamente los campos requeridos al seleccionar un agreement.
 
 ### Base de datos
 
@@ -471,6 +481,25 @@ GET /api/utility-payment-agreements/{agreementId}/required-info
 - [x] Organizar los endpoints por feature en `Api/Endpoints`.
 - [x] Agregar `EndpointsExtensions` como agregador y dejar `Program.cs` con `app.MapEndpoints();`.
 
+### Frontend
+
+- [x] Crear el modelo TypeScript `UtilityPaymentRequiredInfo`.
+- [x] Actualizar `UtilityPaymentAgreementsService` para consumir:
+
+```text
+GET /api/utility-payment-agreements/{agreementId}/required-info
+```
+
+- [x] Consultar dinámicamente la información requerida al seleccionar un agreement.
+- [x] Construir un Reactive Form dinámico a partir de los metadatos retornados por el backend.
+- [x] Crear cada `FormControl` usando el `code` de su required-info.
+- [x] Aplicar dinámicamente `Validators.required`, `Validators.minLength` y `Validators.pattern` cuando corresponda.
+- [x] Aplicar `maxLength` en el input HTML y preparar dinámicamente el placeholder.
+- [x] Renderizar los campos mediante `[formGroup]` y `[formControlName]`.
+- [x] Mostrar errores usando `touched` y `hasError()`.
+- [x] Deshabilitar el botón `Continue` mientras `requiredInfoForm.invalid` sea `true`.
+- [x] Mantener una interfaz visual simple; el styling se abordará después de completar más flujo funcional.
+
 ### Tests y validación
 
 - [x] Actualizar los tests de integración existentes para limpiar también `utility_payment_required_info`.
@@ -480,24 +509,29 @@ GET /api/utility-payment-agreements/{agreementId}/required-info
 - [x] `Api.Tests` pasando.
 - [x] Suite backend: 9 tests, 9 correctos, 0 errores.
 - [x] Validar manualmente el endpoint con `curl`; los resultados se retornan ordenados por `displayOrder`.
+- [x] Validar manualmente el formulario dinámico con `Water` y `Mobile Phone`.
+- [x] Suite frontend: `10 SUCCESS`.
+- [x] `ng build` exitoso y sin errores.
 
 `Domain.Tests` y `Services.Tests` todavía no contienen tests reales y muestran la advertencia `no tests available`.
 
+## Decisiones
+
+- Mantener la UI simple por ahora; el estilizado se realizará después de completar más flujo funcional.
+- Seguir usando Reactive Forms para los campos dinámicos.
+- No introducir Angular Material ni otra librería de componentes todavía.
+- Mantener el frontend dentro del feature `utility-payment-agreements` por ahora.
+- No refactorizar todavía el `apiUrl` hardcoded ni la configuración CORS.
+
 ## Próximo paso
 
-Implementar el frontend Angular para consumir:
-
-```text
-GET /api/utility-payment-agreements/{agreementId}/required-info
-```
-
-y mostrar dinámicamente los campos requeridos al seleccionar un agreement.
+Continuar con la Fase 3 — Cuentas bancarias.
 
 ## Definition of Done
 
 Dado un agreement, la API puede informar qué datos necesita para realizar un Inquiry y el frontend puede presentar dinámicamente esos campos al usuario.
 
-Estado: `IN PROGRESS`. El backend de `UtilityPaymentRequiredInfo` está completado; la Fase 2 permanece abierta hasta completar el frontend.
+Estado: `CLOSED`.
 
 ---
 
@@ -747,10 +781,10 @@ Antes de introducir cada concepto:
 - [x] Services.
 - [x] Dependency Injection.
 - [x] HttpClient.
-- [ ] Reactive Forms.
+- [x] Reactive Forms.
 - [x] Observables.
 - [x] RxJS.
-- [ ] Signals.
+- [x] Signals.
 - [x] Manejo de errores.
 
 ## Primer flujo
@@ -780,8 +814,8 @@ Construir progresivamente el flujo completo desde Angular.
 ## Iteraciones
 
 - [x] Listar agreements.
-- [ ] Seleccionar agreement.
-- [ ] Mostrar información requerida.
+- [x] Seleccionar agreement.
+- [x] Mostrar información requerida.
 - [ ] Seleccionar cuenta.
 - [ ] Crear formulario de Inquiry.
 - [ ] Consultar deuda.
@@ -868,11 +902,15 @@ Cada elemento se evaluará por necesidad real.
 ## Fase activa
 
 ```text
-Fase 2 — UtilityPaymentRequiredInfo
+Fase 3 — Cuentas bancarias
 ```
 
 ## Completado
 
+- Fase 0 — Bootstrap técnico: `CLOSED`.
+- Fase 1 — Listar Utility Payment Agreements: `CLOSED`.
+- Fase 2 — Información requerida por Agreement: `CLOSED`.
+- Fase 9 — Inicio del frontend Angular: `CLOSED`.
 - Repositorio y estructura inicial.
 - .NET 10.
 - Solution `.slnx`.
@@ -893,11 +931,24 @@ Fase 2 — UtilityPaymentRequiredInfo
 - Pruebas HTTP independientes del servicio.
 - Suite frontend: `7 SUCCESS` con Karma + Firefox.
 - Vertical slice `List Utility Payment Agreements`: `CLOSED`.
+- Backend y frontend de `UtilityPaymentRequiredInfo`.
+- Formulario reactivo dinámico con validaciones basadas en metadatos.
+- Suite backend de Fase 2: 9 tests correctos.
+- Suite frontend: `10 SUCCESS`.
+- Build de Angular exitoso.
+
+## En progreso transversal
+
+```text
+Fase 10 — Flujo frontend de pago
+```
+
+Las iteraciones de listar agreements, seleccionar un agreement y mostrar su información requerida están completadas. Los pasos restantes continúan abiertos y avanzarán con los siguientes vertical slices.
 
 ## Próximo punto al retomar
 
 ```text
-UtilityPaymentRequiredInfo
+Cuentas bancarias
 ```
 
 El proyecto continúa por vertical slices:

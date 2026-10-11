@@ -10,10 +10,61 @@
     <ul>
       @for (agreement of agreements(); track agreement.id) {
         <li>
-          <strong>{{ agreement.name }}</strong>
-          <span> - {{ agreement.description }}</span>
+          <button type="button" (click)="selectAgreement(agreement.id)">
+            <strong>{{ agreement.name }}</strong>
+            <span> - {{ agreement.description }}</span>
+          </button>
         </li>
       }
     </ul>
+  }
+
+  @if (requiredInfoLoading()) {
+    <p>Loading required information...</p>
+  } @else if (requiredInfoError()) {
+    <p>{{ requiredInfoError() }}</p>
+  } @else if (requiredInfo().length > 0) {
+    <h3>Required information</h3>
+
+    <form [formGroup]="requiredInfoForm">
+      @for (info of requiredInfo(); track info.id) {
+        <div>
+          <label [for]="info.code">
+            {{ info.label }}
+          </label>
+
+          <input
+            [id]="info.code"
+            type="text"
+            [formControlName]="info.code"
+            [maxlength]="info.maxLength ?? null"
+            [placeholder]="info.placeholder ?? ''"
+          />
+
+          @if (
+            requiredInfoForm.get(info.code)?.touched &&
+            requiredInfoForm.get(info.code)?.hasError('required')
+          ) {
+            <p>{{ info.label }} is required.</p>
+          }
+
+          @if (
+            requiredInfoForm.get(info.code)?.touched &&
+            requiredInfoForm.get(info.code)?.hasError('minlength')
+          ) {
+            <p>{{ info.label }} must have at least {{ info.minLength }} characters.</p>
+          }
+
+          @if (
+            requiredInfoForm.get(info.code)?.touched &&
+            requiredInfoForm.get(info.code)?.hasError('pattern')
+          ) {
+            <p>{{ info.label }} has an invalid format.</p>
+          }
+        </div>
+      }
+
+      <button type="button" [disabled]="requiredInfoForm.invalid">Continue</button>
+    </form>
   }
 </section>
