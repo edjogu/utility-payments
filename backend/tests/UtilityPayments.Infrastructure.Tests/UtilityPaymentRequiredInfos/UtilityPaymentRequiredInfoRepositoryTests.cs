@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using UtilityPayments.Domain.UtilityPaymentAgreements;
 using UtilityPayments.Domain.UtilityPaymentRequiredInfos;
 using UtilityPayments.Infrastructure.Persistence;
+using UtilityPayments.Infrastructure.Tests.TestInfrastructure;
 using UtilityPayments.Infrastructure.UtilityPaymentRequiredInfos;
 
 namespace UtilityPayments.Infrastructure.Tests.UtilityPaymentRequiredInfos;
@@ -9,18 +10,11 @@ namespace UtilityPayments.Infrastructure.Tests.UtilityPaymentRequiredInfos;
 [Collection("Database")]
 public class UtilityPaymentRequiredInfoRepositoryTests
 {
-    private const string ConnectionString =
-        "Host=localhost;Port=5432;Database=utility_payments_tests;Username=utility_user;Password=utility_password";
-
     [Fact]
     public async Task GetActiveByAgreementIdAsync_ShouldReturnOnlyActiveRequiredInfos_OrderedByDisplayOrder()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<UtilityPaymentsDbContext>()
-            .UseNpgsql(ConnectionString)
-            .Options;
-
-        await using var dbContext = new UtilityPaymentsDbContext(options);
+        await using var dbContext = TestDbContextFactory.Create();
 
         await CleanTablesAsync(dbContext);
 

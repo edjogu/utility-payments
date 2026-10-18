@@ -525,7 +525,7 @@ GET /api/utility-payment-agreements/{agreementId}/required-info
 
 ## Próximo paso
 
-Continuar con la Fase 3 — Cuentas bancarias.
+Continuar con la Fase 3 — Contratos bancarios.
 
 ## Definition of Done
 
@@ -535,32 +535,147 @@ Estado: `CLOSED`.
 
 ---
 
-# Fase 3 — Cuentas bancarias
+# Fase 3 — Contratos bancarios
+
+## Estado
+
+```text
+IN PROGRESS — BACKEND COMPLETADO / FRONTEND PENDIENTE
+```
 
 ## Objetivo
 
-Permitir seleccionar una cuenta desde la cual posteriormente se realizará el pago.
+Permitir consultar y posteriormente seleccionar un contrato bancario disponible como fuente de fondos para continuar el flujo de pago.
 
 ## Alcance
 
-- [ ] Revisar necesidad real de `Customer`.
-- [ ] Modelar `BankAccount`.
-- [ ] Definir moneda.
-- [ ] Definir saldo.
-- [ ] Definir estado de cuenta.
-- [ ] Listar cuentas disponibles.
-- [ ] Agregar reglas de dominio que realmente correspondan.
-- [ ] Agregar pruebas.
+- [x] Modelar los contratos bancarios y sus catálogos asociados.
+- [x] Definir moneda mediante `Currency`.
+- [x] Definir el estado del contrato mediante `ContractStatus`.
+- [x] Listar contratos disponibles para un cliente.
+- [x] Aplicar las reglas de disponibilidad definidas para esta fase.
+- [x] Agregar pruebas automatizadas de backend.
+- [ ] Consumir los contratos disponibles desde Angular.
+- [ ] Permitir seleccionar un contrato en el flujo frontend.
 
-## Posible endpoint
+### Modelo
 
 ```text
-GET /api/bank-accounts
+Client
+  -> CustomerContractRelation
+  -> Contract
+  -> ContractProduct
+  -> ContractType
+
+Contract -> ContractStatus
+ContractProduct -> Currency
+CustomerContractRelation -> CustomerContractRelationType
+Client -> ClientType
+```
+
+`Account` y `Balance` se difieren explícitamente para una fase posterior de pago/débito. `Balance` no forma parte de `Contract`.
+
+### Base de datos
+
+- [x] Crear `cls_client_types`.
+- [x] Crear `cls_contract_types`.
+- [x] Crear `cls_contract_statuses`.
+- [x] Crear `cls_customer_contract_relation_types`.
+- [x] Crear `cls_currencies`.
+- [x] Crear `clients`.
+- [x] Crear `contract_products`.
+- [x] Crear `contracts`.
+- [x] Crear `customer_contract_relations`.
+- [x] Agregar scripts SQL versionados de creación y seed desde `005` hasta `022`.
+
+### Domain
+
+- [x] Crear `Clients/Client.cs`.
+- [x] Crear `Clients/ClientType.cs`.
+- [x] Crear `Contracts/Contract.cs`.
+- [x] Crear `Contracts/ContractProduct.cs`.
+- [x] Crear `Contracts/ContractType.cs`.
+- [x] Crear `Contracts/ContractStatus.cs`.
+- [x] Crear `Contracts/CustomerContractRelation.cs`.
+- [x] Crear `Contracts/CustomerContractRelationType.cs`.
+- [x] Crear `Currencies/Currency.cs`.
+
+### Application
+
+- [x] Crear `AvailableContract`.
+- [x] Crear `AvailableContractResponse`.
+- [x] Crear `IContractRepository`.
+- [x] Crear el caso de uso `GetAvailableContracts`.
+- [x] Registrar las dependencias de Application.
+
+### Infrastructure
+
+- [x] Crear las configuraciones de EF Core para todas las entidades nuevas.
+- [x] Agregar los `DbSet` correspondientes a `UtilityPaymentsDbContext`.
+- [x] Implementar `ContractRepository`.
+- [x] Registrar `IContractRepository` → `ContractRepository`.
+
+### Reglas de disponibilidad
+
+- [x] El cliente debe estar activo.
+- [x] La relación entre cliente y contrato debe estar activa.
+- [x] El tipo de relación debe ser `OWNER`.
+- [x] El estado del contrato debe ser `ACTIVE`.
+- [x] El tipo de contrato debe ser `SAVINGS_ACCOUNT` o `CURRENT_ACCOUNT`.
+- [x] Excluir `CREDIT_CARD` por ahora.
+- [x] Mantener el saldo y la elegibilidad para débito fuera del alcance de la Fase 3.
+
+### Api
+
+- [x] Crear endpoint:
+
+```text
+GET /api/clients/{clientId}/contracts
+```
+
+- [x] Retornar:
+  - `Id`.
+  - `ContractNumber`.
+  - `ProductName`.
+  - `ContractType`.
+  - `Currency`.
+
+### Frontend
+
+- [ ] Crear el modelo TypeScript para los contratos disponibles.
+- [ ] Consumir `GET /api/clients/{clientId}/contracts` desde Angular.
+- [ ] Mostrar los contratos disponibles.
+- [ ] Permitir seleccionar un contrato para continuar el flujo de pago.
+
+### Tests y validación
+
+- [x] Agregar tests de Application para `GetAvailableContracts`.
+- [x] Agregar un test de integración de Infrastructure para `ContractRepository` contra PostgreSQL real.
+- [x] Agregar tests de integración de API para el endpoint de contratos.
+- [x] Suite backend: 14 tests correctos.
+- [x] Validar manualmente `GET /api/clients/1/contracts` contra PostgreSQL.
+- [x] Confirmar que la respuesta incluye `Savings Plus` y `Current Standard`.
+- [x] Confirmar que la respuesta excluye contratos `CREDIT_CARD` y `CLOSED`.
+
+### Infraestructura de tests
+
+- [x] Configurar `Infrastructure.Tests` con su propio `appsettings.json`.
+- [x] Centralizar la creación de `UtilityPaymentsDbContext` en `TestDbContextFactory`.
+- [x] Configurar `Api.Tests` con su propio `appsettings.json`.
+- [x] Actualizar `CustomWebApplicationFactory` para reemplazar el `DbContext` registrado por la aplicación por uno configurado para `utility_payments_tests`.
+- [x] Eliminar las connection strings hardcoded de las clases y factories de tests.
+
+## Endpoint
+
+```text
+GET /api/clients/{clientId}/contracts
 ```
 
 ## Definition of Done
 
-La aplicación puede consultar cuentas utilizables para pagos.
+El backend puede consultar desde PostgreSQL los contratos bancarios disponibles para un cliente aplicando las reglas definidas. La fase quedará cerrada cuando el frontend consuma el endpoint y permita seleccionar un contrato para continuar el flujo de pago.
+
+Estado: `IN PROGRESS`.
 
 ---
 
@@ -816,7 +931,7 @@ Construir progresivamente el flujo completo desde Angular.
 - [x] Listar agreements.
 - [x] Seleccionar agreement.
 - [x] Mostrar información requerida.
-- [ ] Seleccionar cuenta.
+- [ ] Seleccionar contrato.
 - [ ] Crear formulario de Inquiry.
 - [ ] Consultar deuda.
 - [ ] Mostrar resultado.
@@ -902,7 +1017,7 @@ Cada elemento se evaluará por necesidad real.
 ## Fase activa
 
 ```text
-Fase 3 — Cuentas bancarias
+Fase 3 — Contratos bancarios (`backend` completado; `frontend` pendiente)
 ```
 
 ## Completado

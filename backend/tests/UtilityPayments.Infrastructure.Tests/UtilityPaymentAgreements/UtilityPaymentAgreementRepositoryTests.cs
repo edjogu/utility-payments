@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using UtilityPayments.Domain.UtilityPaymentAgreements;
 using UtilityPayments.Infrastructure.Persistence;
+using UtilityPayments.Infrastructure.Tests.TestInfrastructure;
 using UtilityPayments.Infrastructure.UtilityPaymentAgreements;
 
 namespace UtilityPayments.Infrastructure.Tests.UtilityPaymentAgreements;
@@ -8,18 +9,11 @@ namespace UtilityPayments.Infrastructure.Tests.UtilityPaymentAgreements;
 [Collection("Database")]
 public class UtilityPaymentAgreementRepositoryTests
 {
-    private const string ConnectionString =
-        "Host=localhost;Port=5432;Database=utility_payments_tests;Username=utility_user;Password=utility_password";
-
     [Fact]
     public async Task GetActiveAsync_ShouldReturnOnlyActiveAgreements_OrderedByName()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<UtilityPaymentsDbContext>()
-            .UseNpgsql(ConnectionString)
-            .Options;
-
-        await using var dbContext = new UtilityPaymentsDbContext(options);
+        await using var dbContext = TestDbContextFactory.Create();
 
         await CleanTableAsync(dbContext);
 
@@ -83,15 +77,16 @@ public class UtilityPaymentAgreementRepositoryTests
             await CleanTableAsync(dbContext);
         }
     }
+
     private static async Task CleanTableAsync(
         UtilityPaymentsDbContext dbContext)
     {
         await dbContext.Database.ExecuteSqlRawAsync(
-    """
-    TRUNCATE TABLE
-        public.utility_payment_required_info,
-        public.utility_payment_agreements
-    RESTART IDENTITY;
-    """);
+            """
+            TRUNCATE TABLE
+                public.utility_payment_required_info,
+                public.utility_payment_agreements
+            RESTART IDENTITY;
+            """);
     }
 }

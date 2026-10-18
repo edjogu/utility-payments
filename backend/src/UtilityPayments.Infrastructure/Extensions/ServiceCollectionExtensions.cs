@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using UtilityPayments.Application.Contracts;
 using UtilityPayments.Application.UtilityPaymentAgreements;
 using UtilityPayments.Application.UtilityPaymentRequiredInfos;
+using UtilityPayments.Infrastructure.Contracts;
 using UtilityPayments.Infrastructure.Persistence;
 using UtilityPayments.Infrastructure.UtilityPaymentAgreements;
 using UtilityPayments.Infrastructure.UtilityPaymentRequiredInfos;
@@ -22,6 +24,8 @@ public static class ServiceCollectionExtensions
 
         services.AddDbContext<UtilityPaymentsDbContext>(options =>
             options.UseNpgsql(connectionString));
+
+        services.AddScoped<IContractRepository, ContractRepository>();
 
         services.AddScoped<IUtilityPaymentAgreementRepository, UtilityPaymentAgreementRepository>();
 
